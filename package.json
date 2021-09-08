@@ -1,0 +1,30 @@
+{
+  "name": "express-back-end",
+  "version": "1.0.0",
+  "description": "Express back-end template project.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Data-Leap/games-back-end.git"
+  },
+  "author": "SinestroWhite",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SinestroWhite/express-back-end"
+  },
+  "homepage": "https://github.com/SinestroWhite/express-back-end#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "mysql": "^2.18.1"
+  }
+}

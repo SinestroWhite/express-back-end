@@ -2,6 +2,7 @@ const mysql = require('mysql');
 const fs = require('fs');
 const path = require('path');
 
+const util = require('util');
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -9,7 +10,9 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-db.connect((err) => {
+db.promiseQuery = util.promisify(db.query).bind(db);
+
+db.connect(async (err) => {
     if (err) {
         throw err;
     }
@@ -17,17 +20,17 @@ db.connect((err) => {
     console.log('Connected to the DB!');
 
     const migrationsDir = path.resolve(__dirname, 'migrations');
-    iterateQueryDir(migrationsDir);
+    await iterateQueryDir(migrationsDir);
 
-    // console.log('Migrations have been executed!');
+    console.log('Migrations have been executed!');
 
     const seedsDir = path.resolve(__dirname, 'seeds');
-    iterateQueryDir(seedsDir);
+    await iterateQueryDir(seedsDir);
 
-    // console.log('Seeds have been executed!');
+    console.log('Seeds have been executed!');
 });
 
-function iterateQueryDir(dir) {
+async function iterateQueryDir(dir) {
     // list files in directory and loop through
     for (const file of fs.readdirSync(dir).sort()) {
         // builds full path of file
@@ -40,15 +43,7 @@ function iterateQueryDir(dir) {
             throw err;
         }
 
-        db.query(query, (err, rows) => {
-            if (err) {
-                throw err;
-            }
-
-            // console.log('Executed: ' + query);
-            // console.log('Result: ');
-            // console.log(rows);
-        });
+        await db.promiseQuery(query);
     }
 }
 

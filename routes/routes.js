@@ -8,16 +8,16 @@ module.exports = (app) => {
         res.json({message: "Hello"});
     });
 
-    app.get('/api/v1/attachment', (req, res) => {
-        let id = req.query.id;
-        const file = `${__dirname}/../attachments/${id}`;
-        res.download(file, 'data.json');
-    });
-
-    // app.all('*', (req, res) => {
-    //     res.status(404);
-    //     res.json({
-    //         message: STATUS_CODES.NotFound
-    //     });
+    // app.get('/api/v1/attachment', (req, res) => {
+    //     let id = req.query.id;
+    //     const file = `${__dirname}/../attachments/${id}`;
+    //     res.download(file, 'data.json');
     // });
+
+    app.all('*', (req, res) => {
+        res.status(404);
+        res.json({
+            message: STATUS_CODES.NotFound
+        });
+    });
 };

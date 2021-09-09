@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id CHAR(36) PRIMARY KEY,
     email TEXT NOT NULL,
     password TEXT NOT NULL
 );

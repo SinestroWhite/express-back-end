@@ -67,35 +67,16 @@ module.exports = {
         authService.register(email, password).then((data) => {
             res.status(STATUS_CODES.OK);
             res.json(data);
-        }).catch(next)
+        }).catch(next);
     },
-    resend: async (req, res) => {
+    resend: async (req, res, next) => {
         const id = req.id;
         const email = req.email;
 
-        try {
-            const items = await db.promiseQuery('DELETE FROM confirmations WHERE user_id = ?', id);
-            if (items.affectedRows === 0) {
-                res.status(STATUS_CODES.BadRequest);
-                res.json(format.error('Your account has been confirmed or you have provided invalid id.'));
-                return;
-            }
-
-            const confirmation_id = encryption.generateGuid();
-            await db.promiseQuery('INSERT INTO confirmations (id, user_id) VALUES (?, ?);', [
-                confirmation_id,
-                id
-            ]);
-
-            await emailSender.sendEmailConfirmationLink(email, confirmation_id);
+        authService.resend(id, email).then(() => {
             res.status(STATUS_CODES.OK);
-            res.json(format.success('A new email has been sent, please, check your spam box.'));
-        } catch (exception) {
-            console.log(exception);
-            logger.error('Resend Database Exception:', exception);
-            res.status(STATUS_CODES.InternalServerError);
-            res.json(format.error('There was an internal error. A new email could not be resend.'));
-        }
+            res.json(format.success('A new email has been sent. Please, check your spam box.'));
+        }).catch(next);
     },
     confirm: async (req, res) => {
         const id = req.query.token;

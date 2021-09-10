@@ -2,6 +2,9 @@ const mysql = require('mysql');
 const fs = require('fs');
 const path = require('path');
 
+const log4js = require('log4js');
+const logger = log4js.getLogger('error');
+
 const util = require('util');
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -14,7 +17,8 @@ db.promiseQuery = util.promisify(db.query).bind(db);
 
 db.connect(async (err) => {
     if (err) {
-        throw err;
+        console.log(err);
+        logger.error('Database Connection Exception: ', err);
     }
 
     console.log('Connected to the DB!');
@@ -42,8 +46,13 @@ async function iterateQueryDir(dir) {
         } catch (err) {
             throw err;
         }
+        try {
+            await db.promiseQuery(query);
+        } catch (exception) {
+            console.log(exception);
+            logger.error('Database Migration Exception: ', exception);
+        }
 
-        await db.promiseQuery(query);
     }
 }
 

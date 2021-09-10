@@ -4,15 +4,17 @@ const logger = log4js.getLogger('error');
 
 function errorHandler(err, req, res, next) {
     if (process.env.NODE_ENV === 'development') {
-        console.log(err.status);
+        console.log('ErrorHandle', err);
     }
 
-    if (err.status === 500) {
+    if (!err.status || err.status === 500) {
         logger.error(err.stack);
     }
 
-    res.status(err.status);
-    res.json(format.error(err.message));
+    const message = err.status ? err.message : 'Something went wrong. Please, try again.';
+
+    res.status(err.status || 500);
+    res.json(format.error(message));
 }
 
 module.exports = errorHandler;

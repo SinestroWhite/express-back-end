@@ -13,7 +13,20 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-db.promiseQuery = util.promisify(db.query).bind(db);
+
+db.promiseQuery = (...args) => {
+    return new Promise((resolve, reject) => {
+        db.query(...args, (err, rows) => {
+            if (err) {
+                return reject(err);
+            }
+
+            resolve(rows);
+        });
+    });
+}
+
+//util.promisify(db.query).bind(db);
 
 db.connect(async (err) => {
     if (err) {

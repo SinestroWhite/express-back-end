@@ -15,10 +15,12 @@ const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 
 const BadRequestError = require('../../errors/BadRequestError');
-const InternalServerError = require("../../errors/InternalServerError");
+const InternalServerError = require('../../errors/InternalServerError');
 
 const emailRegex = GLOBAL_CONSTANTS.EMAIL_REGEX;
 const expireTime = GLOBAL_CONSTANTS.TOKEN_EXPIRE_TIME;
+
+const authService = require('../services/auth-service');
 
 function generateAccessToken(id, email) {
     return jwt.sign({id, email}, process.env.TOKEN_SECRET, { expiresIn: expireTime });
@@ -26,7 +28,7 @@ function generateAccessToken(id, email) {
 
 module.exports = {
     login: async (req, res, next) => {
-        const email = req.body.email;
+        const email = req.body.email.toLowerCase();
         const password = req.body.password;
 
         // Validate fields
@@ -34,122 +36,38 @@ module.exports = {
             return next(new BadRequestError('Missing email or password.'));
         }
 
-        try {
-            // Check if the email is registered
-            const data = await db.promiseQuery('SELECT * FROM users WHERE email = ?', email);
-
-            if (data.length === 0) {
-                res.status(STATUS_CODES.BadRequest);
-                res.json(format.error('Invalid credentials.'));
-                return;
-            }
-
-            if (data.length > 1) {
-                logger.error('Login Exception:', 'Duplicate email entries in the users table', data);
-                res.status(STATUS_CODES.InternalServerError);
-                res.json(format.error('There was an internal error. Please, try again later.'));
-                return;
-            }
-
-            if (!await argon2.verify(data[0].password, password)) {
-                res.status(STATUS_CODES.BadRequest);
-                res.json(format.error('Invalid credentials.'));
-                return;
-            }
-
-            const id = data[0].id;
-            const token = generateAccessToken(id, email);
-
-            // Check if the user account has been confirmed
-            let isConfirmed = true;
-            const confirmations = await db.promiseQuery('SELECT * FROM confirmations WHERE user_id = ?', id);
-            if (confirmations.length > 0) {
-                isConfirmed = false;
-            }
-
+        authService.authenticate(email, password).then((data) => {
             res.status(STATUS_CODES.OK);
-            res.json({ token, is_confirmed: isConfirmed });
-        } catch (exception) {
-            console.log(exception);
-            logger.error('Login Database Exception:', exception);
-            res.status(STATUS_CODES.InternalServerError);
-            res.json(format.error('There was an internal error. You cannot be authenticated.'));
-        }
+            res.json(data);
+        }).catch(next);
     },
-    register: async (req, res) => {
-        const email = req.body.email;
+    register: async (req, res, next) => {
+        let email = req.body.email;
         const password = req.body.password;
         const confirm = req.body.confirm_password;
 
         // Validate fields
         if (!emailRegex.test(email)) {
-            res.status(STATUS_CODES.BadRequest);
-            res.json(format.error('Invalid email.'));
-            return;
+            return next(new BadRequestError('Invalid email.'));
         }
 
+        email = email.toLowerCase();
         if (!password || !confirm) {
-            res.status(STATUS_CODES.BadRequest);
-            res.json(format.error('Password or confirm password fields are missing'));
-            return;
+            return next(new BadRequestError('Invalid password or confirm_password.'));
         }
 
         if (password.length <= 5) {
-            res.status(STATUS_CODES.BadRequest);
-            res.json(format.error('Password must be at least 6 symbols'));
-            return;
+            return next(new BadRequestError('Password must be at least 6 symbols.'));
         }
 
         if (password !== confirm) {
-            res.status(STATUS_CODES.BadRequest);
-            res.json(format.error('Passwords does not match.'));
-            return;
+            return next(new BadRequestError('Passwords does not match.'));
         }
 
-        let hash;
-        try {
-            hash = await argon2.hash(password);
-        } catch (exception) {
-            console.log(exception);
-            logger.error('Register Argon2 Exception:', exception);
-            res.status(STATUS_CODES.InternalServerError);
-            res.json(format.error('There was an internal error. Email could not be registered.'));
-        }
-
-        try {
-            // Check if the email is already registered
-            const data = await db.promiseQuery('SELECT * FROM users WHERE email = ?', email);
-            if (data.length !== 0) {
-                res.status(STATUS_CODES.BadRequest);
-                res.json(format.error('Email already registered.'));
-                return;
-            }
-
-            // Register a new user and generate a confirmation entry
-            const user_id = encryption.generateGuid();
-            await db.promiseQuery('INSERT INTO users (id, email, password) VALUES (?, ?, ?);', [
-                user_id,
-                email.toLowerCase(),
-                hash
-            ]);
-
-            const confirmation_id = encryption.generateGuid();
-            await db.promiseQuery('INSERT INTO confirmations (id, user_id) VALUES (?, ?);', [
-                confirmation_id,
-                user_id
-            ]);
-
-            await emailSender.sendEmailConfirmationLink(email, confirmation_id);
-            const token = generateAccessToken(user_id, email);
-
+        authService.register(email, password).then((data) => {
             res.status(STATUS_CODES.OK);
-            res.json({ token, is_confirmed: false });
-        } catch (exception) {
-            console.log(exception);
-            logger.error('Register Database Exception:', exception);
-            res.status(STATUS_CODES.InternalServerError);
-            res.json(format.error('There was an internal error. Email could not be registered.'));
-        }
+            res.json(data);
+        }).catch(next)
     },
     resend: async (req, res) => {
         const id = req.id;

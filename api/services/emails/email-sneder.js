@@ -4,6 +4,11 @@ const path = require('path');
 
 const GLOBAL_CONSTANTS = require('../../../common/global-constants');
 
+const InternalServerError = require('../../../errors/InternalServerError');
+
+const log4js = require('log4js');
+const logger = log4js.getLogger('error');
+
 const transport = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -39,9 +44,9 @@ module.exports = {
 
         try {
             await transport.sendMail(message);
-        } catch(err) {
-            console.log(err);
-            return false;
+        } catch(exception) {
+            logger.error('Nodemailer:', exception);
+            throw new InternalServerError();
         }
         return true;
     }

@@ -18,7 +18,8 @@ const expireTime = GLOBAL_CONSTANTS.TOKEN_EXPIRE_TIME;
 module.exports = {
     authenticate,
     register,
-    resend
+    resend,
+    confirm
 };
 
 async function authenticate(email, password) {
@@ -50,9 +51,13 @@ async function register(email, password) {
 }
 
 async function resend(id, email) {
-    await deleteConfirmation(id);
+    await deleteConfirmationByUserId(id);
     const confirmation_id = await insertConfirmation(id);
     await emailSender.sendEmailConfirmationLink(email, confirmation_id);
+}
+
+async function confirm(id) {
+    await deleteConfirmationById(id);
 }
 
 async function getUserByEmail(email) {
@@ -114,10 +119,17 @@ async function insertConfirmation(user_id) {
     return confirmation_id;
 }
 
-async function deleteConfirmation(user_id) {
+async function deleteConfirmationByUserId(user_id) {
     const items = await db.promiseQuery('DELETE FROM confirmations WHERE user_id = ?', user_id);
     if (items.affectedRows === 0) {
-        throw new BadRequestError('Your account has been already confirmed or you have provided invalid token.');
+        throw new BadRequestError('Your account has been already confirmed or you have provided an invalid token.');
+    }
+}
+
+async function deleteConfirmationById(id) {
+    const items = await db.promiseQuery('DELETE FROM confirmations WHERE id = ?', id);
+    if (items.affectedRows === 0) {
+        throw new BadRequestError('Invalid confirmation token.');
     }
 }
 

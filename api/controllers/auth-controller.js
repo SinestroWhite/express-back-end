@@ -78,26 +78,13 @@ module.exports = {
             res.json(format.success('A new email has been sent. Please, check your spam box.'));
         }).catch(next);
     },
-    confirm: async (req, res) => {
+    confirm: async (req, res, next) => {
         const id = req.query.token;
 
-        try {
-            // Check if the token exists
-            const items = await db.promiseQuery('DELETE FROM confirmations WHERE id = ?', id);
-            if (items.affectedRows === 0) {
-                res.status(STATUS_CODES.BadRequest);
-                res.json(format.error('Invalid confirmation token.'));
-                return;
-            }
-
+        authService.confirm(id).then(() => {
             res.status(STATUS_CODES.OK);
             res.json(format.success('Your account has been confirmed.'));
-        } catch (exception) {
-            console.log(exception);
-            logger.error('Confirm Database Exception:', exception);
-            res.status(STATUS_CODES.InternalServerError);
-            res.json(format.error('There was an internal error. Your account could not be confirmed.'));
-        }
+        }).catch(next);
     },
     changePassword: async (req, res) => {
         const id = req.id;

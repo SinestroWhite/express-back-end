@@ -19,7 +19,8 @@ module.exports = {
     authenticate,
     register,
     resend,
-    confirm
+    confirm,
+    changePassword
 };
 
 async function authenticate(email, password) {
@@ -58,6 +59,21 @@ async function resend(id, email) {
 
 async function confirm(id) {
     await deleteConfirmationById(id);
+}
+
+async function changePassword(id, email, oldPassword, newPassword) {
+    const user = await getUserByEmail(email);
+
+    let isSame = await verifyPassword(user.password, oldPassword);
+    if (!isSame) {
+        throw new BadRequestError('Invalid old password.');
+    }
+
+    const hash = await hashPassword(newPassword);
+    const items = await db.promiseQuery('UPDATE users SET password = ? WHERE id = ?', [hash, id]);
+    if (items.affectedRows !== 1) {
+        throw new BadRequestError('Invalid auth token');
+    }
 }
 
 async function getUserByEmail(email) {

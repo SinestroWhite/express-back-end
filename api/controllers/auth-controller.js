@@ -53,7 +53,7 @@ module.exports = {
 
         email = email.toLowerCase();
         if (!password || !confirm) {
-            return next(new BadRequestError('Invalid password or confirm_password.'));
+            return next(new BadRequestError('Invalid password or confirm password.'));
         }
 
         if (password.length <= 5) {
@@ -86,7 +86,7 @@ module.exports = {
             res.json(format.success('Your account has been confirmed.'));
         }).catch(next);
     },
-    changePassword: async (req, res) => {
+    changePassword: async (req, res, next) => {
         const id = req.id;
         const email = req.email;
         const oldPassword = req.body.old_password;
@@ -94,62 +94,21 @@ module.exports = {
         const confirm = req.body.confirm_password;
 
         if (!oldPassword || !confirm || !newPassword) {
-            res.status(STATUS_CODES.BadRequest);
-            res.json(format.error('Old password or new password or confirm password fields are missing'));
-            return;
+            return next(new BadRequestError('Old password or new password or confirm password fields are missing.'));
         }
 
         if (newPassword.length <= 5) {
-            res.status(STATUS_CODES.BadRequest);
-            res.json(format.error('New password must be at least 6 symbols'));
-            return;
+            return next(new BadRequestError('New password must be at least 6 symbols.'));
         }
 
         if (newPassword !== confirm) {
-            res.status(STATUS_CODES.BadRequest);
-            res.json(format.error('Passwords does not match.'));
-            return;
+            return next(new BadRequestError('Passwords does not match.'));
         }
 
-        try {
-            // Check if the email is registered
-            const data = await db.promiseQuery('SELECT * FROM users WHERE id = ?', id);
-
-            if (data.length === 0) {
-                res.status(STATUS_CODES.BadRequest);
-                res.json(format.error('Invalid user email.'));
-                return;
-            }
-
-            if (data.length > 1) {
-                logger.error('Change Password Exception:', 'Duplicate email entries in the users table', data);
-                res.status(STATUS_CODES.InternalServerError);
-                res.json(format.error('There was an internal error. Please, try again later.'));
-                return;
-            }
-
-            if (!await argon2.verify(data[0].password, oldPassword)) {
-                res.status(STATUS_CODES.BadRequest);
-                res.json(format.error('Invalid old password.'));
-                return;
-            }
-
-            const hash = await argon2.hash(newPassword);
-            const items = await db.promiseQuery('UPDATE users SET password = ? WHERE id = ?', [hash, id]);
-            if (items.affectedRows !== 1) {
-                res.status(STATUS_CODES.BadRequest);
-                res.json(format.error('Invalid user id.'));
-                return;
-            }
-
+        authService.changePassword(id, email, oldPassword, newPassword).then(() => {
             res.status(STATUS_CODES.OK);
             res.json(format.success('Your password has been changed.'));
-        } catch (exception) {
-            // console.log(exception);
-            logger.error('Change Password Database Exception:', exception);
-            res.status(STATUS_CODES.InternalServerError);
-            res.json(format.error('There was an internal error. Your password could not be changed.'));
-        }
+        }).catch(next);
     },
     changeEmail: async (req, res) => {
         const id = req.id;

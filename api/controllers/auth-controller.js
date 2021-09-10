@@ -110,50 +110,19 @@ module.exports = {
             res.json(format.success('Your password has been changed.'));
         }).catch(next);
     },
-    changeEmail: async (req, res) => {
+    changeEmail: async (req, res, next) => {
         const id = req.id;
         const email = req.email;
         const newEmail = req.body.new_email;
 
         // Validate fields
         if (!emailRegex.test(newEmail)) {
-            res.status(STATUS_CODES.BadRequest);
-            res.json(format.error('Invalid new email.'));
-            return;
+            return next(new BadRequestError('Invalid new email.'));
         }
 
-        try {
-            // Check if the email is registered
-            const data = await db.promiseQuery('SELECT * FROM users WHERE email = ?', newEmail);
-            if (data.length !== 0) {
-                res.status(STATUS_CODES.BadRequest);
-                res.json(format.error('Email already used by another user.'));
-                return;
-            }
-
-            const result = await db.promiseQuery('UPDATE users SET email = ? WHERE id = ?', [newEmail, id]);
-            if (result.affectedRows !== 1) {
-                res.status(STATUS_CODES.InternalServerError);
-                res.json(format.error('There was an internal error. Please, try again later'));
-                return;
-            }
-
-            const confirmation_id = encryption.generateGuid();
-            await db.promiseQuery('INSERT INTO confirmations (id, user_id) VALUES (?, ?);', [
-                confirmation_id,
-                id
-            ]);
-
-            await emailSender.sendEmailConfirmationLink(newEmail, confirmation_id);
-            const token = generateAccessToken(id, newEmail);
-
+        authService.changeEmail(id, email, newEmail).then((data) => {
             res.status(STATUS_CODES.OK);
-            res.json({ token, is_confirmed: false });
-        } catch (exception) {
-            console.log(exception);
-            logger.error('Change Email Database Exception:', exception);
-            res.status(STATUS_CODES.InternalServerError);
-            res.json(format.error('There was an internal error. Your email could not be changed.'));
-        }
+            res.json(data);
+        }).catch(next);
     }
 };

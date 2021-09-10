@@ -20,7 +20,8 @@ module.exports = {
     register,
     resend,
     confirm,
-    changePassword
+    changePassword,
+    changeEmail
 };
 
 async function authenticate(email, password) {
@@ -73,6 +74,39 @@ async function changePassword(id, email, oldPassword, newPassword) {
     const items = await db.promiseQuery('UPDATE users SET password = ? WHERE id = ?', [hash, id]);
     if (items.affectedRows !== 1) {
         throw new BadRequestError('Invalid auth token');
+    }
+}
+
+async function changeEmail(id, email, newEmail) {
+    await updateEmail(newEmail, id);
+
+    const confirmation_id = await insertConfirmation(id);
+    await emailSender.sendEmailConfirmationLink(newEmail, confirmation_id);
+
+    const token = generateAccessToken(id, newEmail);
+    return { token, is_confirmed: false };
+}
+
+async function updateEmail(newEmail, id) {
+    let data;
+
+    try {
+        data = await db.promiseQuery('UPDATE users SET email = ? WHERE id = ?', [newEmail, id]);
+    } catch (exception) {
+        if (exception.code === 'ER_DUP_ENTRY') {
+            throw new BadRequestError('Email already used by another user.');
+        }
+        throw exception;
+    }
+
+    if (data.affectedRows  === 0) {
+        throw new BadRequestError('Invalid auth token.');
+    }
+
+    if (data.affectedRows > 1) {
+        logger.error('Database Exception:',
+            'Duplicate email entries in the users table. Multiple rows affected during email change.', data);
+        throw new InternalServerError();
     }
 }
 

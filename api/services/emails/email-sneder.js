@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 
-const GLOBAL_CONSTANTS = require('../../common/global-constants');
+const GLOBAL_CONSTANTS = require('../../../common/global-constants');
 
 const transport = nodemailer.createTransport({
     service: 'gmail',

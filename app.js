@@ -4,6 +4,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const log4js = require("log4js");
+const errorHandler = require('./api/middleware/error-handler');
 
 const app = express();
 require('dotenv').config();
@@ -12,7 +13,10 @@ require('./config/express')(app);
 require('./routes/routes')(app);
 require('./database/config');
 
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(errorHandler);
 
 // Configure logger
 log4js.configure({

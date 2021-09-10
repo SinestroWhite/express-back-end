@@ -4,7 +4,7 @@
 const STATUS_CODES = require('../../common/enums/status-codes');
 const GLOBAL_CONSTANTS = require('../../common/global-constants');
 const db = require('../../database/config');
-const emailSender = require('../../services/emails/email-sneder');
+const emailSender = require('../services/emails/email-sneder');
 const format = require('../../utilities/format');
 const encryption = require('../../utilities/encryption');
 
@@ -14,6 +14,9 @@ const logger = log4js.getLogger('error');
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 
+const BadRequestError = require('../../errors/BadRequestError');
+const InternalServerError = require("../../errors/InternalServerError");
+
 const emailRegex = GLOBAL_CONSTANTS.EMAIL_REGEX;
 const expireTime = GLOBAL_CONSTANTS.TOKEN_EXPIRE_TIME;
 
@@ -22,15 +25,13 @@ function generateAccessToken(id, email) {
 }
 
 module.exports = {
-    login: async (req, res) => {
+    login: async (req, res, next) => {
         const email = req.body.email;
         const password = req.body.password;
 
         // Validate fields
         if (!email || !password) {
-            res.status(STATUS_CODES.BadRequest);
-            res.json(format.error('Missing email or password.'));
-            return;
+            return next(new BadRequestError('Missing email or password.'));
         }
 
         try {

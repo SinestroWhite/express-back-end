@@ -1,6 +1,4 @@
 const jwt = require('jsonwebtoken');
-const log4js = require('log4js');
-const logger = log4js.getLogger('error');
 
 module.exports = function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
@@ -11,10 +9,7 @@ module.exports = function authenticateToken(req, res, next) {
     }
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, data) => {
-        // logger.error('Token Verification Exception: ', err);
-
         if (err) {
-            console.log(err);
             return res.sendStatus(403);
         }
 

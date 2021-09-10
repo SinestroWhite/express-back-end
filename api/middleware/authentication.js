@@ -11,10 +11,10 @@ module.exports = function authenticateToken(req, res, next) {
     }
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, data) => {
-        console.log(err);
         // logger.error('Token Verification Exception: ', err);
 
         if (err) {
+            console.log(err);
             return res.sendStatus(403);
         }
 

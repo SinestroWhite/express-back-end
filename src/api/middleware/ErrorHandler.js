@@ -1,5 +1,5 @@
-import format from '../../utilities/format.js';
-import logger from '../../config/logger.js';
+import format from '../../utilities/Format.js';
+import logger from '../../config/Logger.js';
 
 export default function (err, req, res, next) {
     if (process.env.NODE_ENV === 'development') {

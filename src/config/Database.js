@@ -1,7 +1,7 @@
 import mysql from 'mysql';
 import fs from 'fs';
 import path from 'path';
-import logger from './logger.js';
+import logger from './Logger.js';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -36,31 +36,30 @@ db.connect(async function (err) {
 
     console.log('Connected to the DB!');
 
-    const migrationsDir = path.resolve(path.resolve(), 'database/migrations');
+    const migrationsDir = path.resolve(path.resolve('src'), 'database/migrations');
     await iterateQueryDir(migrationsDir);
 
     console.log('Migrations have been executed!');
 
-    const seedsDir = path.resolve(path.resolve(), 'database/seeds');
+    const seedsDir = path.resolve(path.resolve('src'), 'database/seeds');
     await iterateQueryDir(seedsDir);
 
     console.log('Seeds have been executed!');
 });
 
 async function iterateQueryDir(dir) {
-    // list files in directory and loop through
-    for (const file of fs.readdirSync(dir).sort()) {
-        // builds full path of file
-        const fPath = path.resolve(dir, file);
+    try {
+        // list files in directory and loop through
+        for (const file of fs.readdirSync(dir).sort()) {
+            // builds full path of file
+            const fPath = path.resolve(dir, file);
 
-        let query;
-        try {
-            query = fs.readFileSync(fPath, 'utf8');
+            const query = fs.readFileSync(fPath, 'utf8');
             await db.promiseQuery(query);
-        } catch (err) {
-            logger.error('Migration Exception:', err);
-            throw err;
         }
+    } catch (err) {
+        logger.error('Migration Exception:', err);
+        throw err;
     }
 }
 

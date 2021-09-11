@@ -1,11 +1,11 @@
 // Auth Controller
 // Description: Handles the authentication operations
 
-import STATUS_CODES from '../../common/enums/status-codes.js';
-import GLOBAL_CONSTANTS from '../../common/global-constants.js';
-import format from '../../utilities/format.js';
+import STATUS_CODES from '../../common/enums/StatusCodes.js';
+import GLOBAL_CONSTANTS from '../../common/GlobalConstants.js';
+import format from '../../utilities/Format.js';
 import BadRequestError from '../../errors/BadRequestError.js';
-import authService from '../services/auth-service.js';
+import authService from '../services/AuthService.js';
 
 const emailRegex = GLOBAL_CONSTANTS.EMAIL_REGEX;
 

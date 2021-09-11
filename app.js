@@ -3,9 +3,9 @@ import https from 'https';
 import http from 'http';
 import fs from 'fs';
 
-import './config/database.js';
-import expressConfig from './config/express.js';
-import routesConfig from './routes/routes.js';
+import './src/config/Database.js';
+import expressConfig from './src/config/Express.js';
+import routesConfig from './src/routes/index.js';
 
 const app = express();
 

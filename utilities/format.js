@@ -1,17 +1,22 @@
-module.exports = {
-    error(message) {
-        return {
-            error: {
-                messages: [ message ],
-            },
-        }
-    },
-    success(message) {
-        return {
-            success: {
-                messages: [ message ],
-            },
-        }
-    }
+// Message format utility
 
+function success(message) {
+    return {
+        success: {
+            message: message,
+        },
+    }
 }
+
+function error(message) {
+    return {
+        error: {
+            message: message,
+        },
+    }
+}
+
+export default {
+    success,
+    error
+};

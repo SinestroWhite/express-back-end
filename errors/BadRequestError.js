@@ -1,5 +1,4 @@
-
-const ApplicationError = require('./ApplicationError');
+import ApplicationError from './ApplicationError.js';
 
 class BadRequestError extends ApplicationError {
     constructor(message) {
@@ -7,4 +6,4 @@ class BadRequestError extends ApplicationError {
     }
 }
 
-module.exports = BadRequestError;
+export default BadRequestError;

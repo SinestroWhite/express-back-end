@@ -1,4 +1,6 @@
-module.exports = {
+// Request status codes
+
+export default {
     Continue: 100,
     SwitchingProtocols: 101,
     OK: 200,

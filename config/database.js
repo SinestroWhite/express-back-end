@@ -1,11 +1,12 @@
-const mysql = require('mysql');
-const fs = require('fs');
-const path = require('path');
+import mysql from 'mysql';
+import fs from 'fs';
+import path from 'path';
+import logger from './logger.js';
 
-const log4js = require('log4js');
-const logger = log4js.getLogger('error');
+import dotenv from 'dotenv';
+dotenv.config();
 
-const util = require('util');
+// Create database connection
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -13,8 +14,8 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-
-db.promiseQuery = (...args) => {
+// Promisify query function
+db.promiseQuery = (...args) => { //util.promisify(db.query).bind(db);
     return new Promise((resolve, reject) => {
         db.query(...args, (err, rows) => {
             if (err) {
@@ -26,22 +27,21 @@ db.promiseQuery = (...args) => {
     });
 }
 
-//util.promisify(db.query).bind(db);
-
-db.connect(async (err) => {
+// Connect to database and execute migrations and seeds
+db.connect(async function (err) {
     if (err) {
-        console.log(err);
-        logger.error('Database Connection Exception: ', err);
+        logger.error('Database Connection Exception:', err);
+        throw err;
     }
 
     console.log('Connected to the DB!');
 
-    const migrationsDir = path.resolve(__dirname, 'migrations');
+    const migrationsDir = path.resolve(path.resolve(), 'database/migrations');
     await iterateQueryDir(migrationsDir);
 
     console.log('Migrations have been executed!');
 
-    const seedsDir = path.resolve(__dirname, 'seeds');
+    const seedsDir = path.resolve(path.resolve(), 'database/seeds');
     await iterateQueryDir(seedsDir);
 
     console.log('Seeds have been executed!');
@@ -56,17 +56,12 @@ async function iterateQueryDir(dir) {
         let query;
         try {
             query = fs.readFileSync(fPath, 'utf8');
+            await db.promiseQuery(query);
         } catch (err) {
+            logger.error('Migration Exception:', err);
             throw err;
         }
-        try {
-            await db.promiseQuery(query);
-        } catch (exception) {
-            console.log(exception);
-            logger.error('Database Migration Exception: ', exception);
-        }
-
     }
 }
 
-module.exports = db;
+export default db;

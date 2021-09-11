@@ -1,13 +1,7 @@
-const nodemailer = require('nodemailer');
-const fs = require('fs');
-const path = require('path');
+import nodemailer from 'nodemailer';
 
-const GLOBAL_CONSTANTS = require('../../../common/global-constants');
-
-const InternalServerError = require('../../../errors/InternalServerError');
-
-const log4js = require('log4js');
-const logger = log4js.getLogger('error');
+import InternalServerError from '../../../errors/InternalServerError.js';
+import logger from '../../../config/logger.js';
 
 const transport = nodemailer.createTransport({
     service: 'gmail',
@@ -20,17 +14,7 @@ const transport = nodemailer.createTransport({
     }
 });
 
-module.exports = {
-    sendMail: async (receiver, subject, content) => {
-        const message = {
-            from: 'Gallery',
-            to: `${receiver}`,
-            subject: subject,
-            html: content
-        };
-        const result = await transport.sendMail(message);
-    },
-
+export default {
     sendEmailConfirmationLink: async (email, token) => {
         // const html = fs.readFileSync(path.join(__dirname,"templates/confirm/confirm.html"));
 

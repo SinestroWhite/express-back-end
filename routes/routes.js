@@ -1,7 +1,10 @@
-const authRoutes = require('./auth-routes');
-const STATUS_CODES = require('../common/enums/status-codes');
+import express from 'express';
+import path from 'path';
+import STATUS_CODES from '../common/enums/status-codes.js';
+import authRoutes from './auth-routes.js';
+import errorHandler from '../api/middleware/error-handler.js';
 
-module.exports = (app) => {
+export default function (app) {
     app.use('/api/v1/auth', authRoutes);
 
     app.get('/api/v1/', (req, res) => {
@@ -15,9 +18,12 @@ module.exports = (app) => {
     // });
 
     app.all('*', (req, res) => {
-        res.status(404);
+        res.status(STATUS_CODES.NotFound);
         res.json({
             message: STATUS_CODES.NotFound
         });
     });
-};
+
+    app.use(express.static(path.join(path.resolve(), 'public')));
+    app.use(errorHandler);
+}

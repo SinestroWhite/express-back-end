@@ -1,21 +1,18 @@
-const db = require('../../database/config');
-const argon2 = require('argon2');
+import argon2 from 'argon2';
+import db from '../../config/database.js';
+import jwt from 'jsonwebtoken';
 
-const log4js = require('log4js');
-const logger = log4js.getLogger('error');
+import logger from '../../config/logger.js';
+import encryption from '../../utilities/encryption.js';
+import emailSender from './emails/email-sneder.js';
 
-const BadRequestError = require('../../errors/BadRequestError');
-const InternalServerError = require('../../errors/InternalServerError');
+import BadRequestError from '../../errors/BadRequestError.js';
+import InternalServerError from '../../errors/InternalServerError.js';
 
-const jwt = require('jsonwebtoken');
-
-const GLOBAL_CONSTANTS = require('../../common/global-constants');
-const encryption = require('../../utilities/encryption');
-const emailSender = require('./emails/email-sneder');
-
+import GLOBAL_CONSTANTS from '../../common/global-constants.js';
 const expireTime = GLOBAL_CONSTANTS.TOKEN_EXPIRE_TIME;
 
-module.exports = {
+export default {
     authenticate,
     register,
     resend,

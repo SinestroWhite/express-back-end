@@ -1,14 +1,13 @@
 // Auth Controller
 // Description: Handles the authentication operations
 
-const STATUS_CODES = require('../../common/enums/status-codes');
-const GLOBAL_CONSTANTS = require('../../common/global-constants');
-const format = require('../../utilities/format');
+import STATUS_CODES from '../../common/enums/status-codes.js';
+import GLOBAL_CONSTANTS from '../../common/global-constants.js';
+import format from '../../utilities/format.js';
+import BadRequestError from '../../errors/BadRequestError.js';
+import authService from '../services/auth-service.js';
 
 const emailRegex = GLOBAL_CONSTANTS.EMAIL_REGEX;
-
-const BadRequestError = require('../../errors/BadRequestError');
-const authService = require('../services/auth-service');
 
 function login(req, res, next) {
     const email = req.body.email.toLowerCase();
@@ -104,6 +103,10 @@ function changeEmail(req, res, next) {
     const newEmail = req.body.new_email;
 
     // Validate fields
+    if (email === newEmail) {
+        return next(new BadRequestError('Same email.'));
+    }
+
     if (!emailRegex.test(newEmail)) {
         return next(new BadRequestError('Invalid new email.'));
     }
@@ -114,7 +117,7 @@ function changeEmail(req, res, next) {
     }).catch(next);
 }
 
-module.exports = {
+export default {
     login,
     register,
     resend,

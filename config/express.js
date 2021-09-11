@@ -1,14 +1,16 @@
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const session = require('express-session');
-const cors = require('cors');
-const errorHandler = require('../api/middleware/error-handler');
+import bodyParser from 'body-parser';
 
-module.exports = (app) => {
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import cors from 'cors';
+
+export default function (app) {
     //Define middlewares
     app.use(cookieParser());
     app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({extended: true}));
+    app.use(bodyParser.urlencoded({
+        extended: true
+    }));
 
     app.use(session({
         secret: process.env.SESSION_SECRET,
@@ -26,4 +28,4 @@ module.exports = (app) => {
     });
 
     console.log('Express ready!');
-};
+}

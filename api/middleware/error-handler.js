@@ -1,8 +1,7 @@
-const format = require('../../utilities/format');
-const log4js = require('log4js');
-const logger = log4js.getLogger('error');
+import format from '../../utilities/format.js';
+import logger from '../../config/logger.js';
 
-function errorHandler(err, req, res, next) {
+export default function (err, req, res, next) {
     if (process.env.NODE_ENV === 'development') {
         console.log('ErrorHandle', err);
     }
@@ -16,5 +15,3 @@ function errorHandler(err, req, res, next) {
     res.status(err.status || 500);
     res.json(format.error(message));
 }
-
-module.exports = errorHandler;

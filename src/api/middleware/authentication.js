@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import authService from '../services/auth-service.js';
+import authService from '../services/auth/auth-service.js';
 import UnauthorizedError from '../../errors/unauthorized-error.js';
 
 export default function (req, res, next) {

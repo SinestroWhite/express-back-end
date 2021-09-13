@@ -1,25 +1,29 @@
 import {Router} from 'express';
-import authController from '../api/controllers/auth-controller.js';
-import authenticateToken from '../api/middleware/authentication.js';
+
+import authController from '../api/controllers/auth/auth-controller.js';
+import confirmController from '../api/controllers/auth/confirm-controller.js';
+import forgottenController from '../api/controllers/auth/forgotten-controller.js';
+import userController from '../api/controllers/auth/user-controller.js';
+
+import validateAccessToken from '../api/middleware/authentication.js';
+import validateFields from '../api/middleware/validation.js';
 
 import authValidation from '../api/validation/auth-validation.js';
-import validation from '../api/middleware/validation.js';
 
 const router = Router();
 // TODO: Add rate limiter
-router.post('/register', validation(authValidation.register, 'body'), authController.register);
-router.post('/login', validation(authValidation.login, 'body'), authController.login);
+router.post('/register', validateFields(authValidation.register, 'body'), authController.register);
+router.post('/login', validateFields(authValidation.login, 'body'), authController.login);
+router.post('/logout', validateFields(authValidation.confirm, 'body'), authController.logout);
+router.post('/refresh-token', validateFields(authValidation.confirm, 'body'), authController.refreshToken);
 
-router.post('/logout', validation(authValidation.confirm, 'body'), authController.logout);
-router.post('/refresh-token', validation(authValidation.confirm, 'body'), authController.refreshToken);
+router.get('/resend', validateAccessToken, confirmController.resend);
+router.post('/confirm', validateFields(authValidation.confirm, 'body'), confirmController.confirm);
 
-router.get('/resend', authenticateToken, authController.resend);
-router.post('/confirm', validation(authValidation.confirm, 'body'), authController.confirm);
+router.post('/forgotten', validateFields(authValidation.forgotten, 'body'), forgottenController.forgotten);
+router.post('/forgotten-confirm', validateFields(authValidation.forgottenConfirm, 'body'), forgottenController.forgottenConfirm);
 
-router.post('/forgotten', validation(authValidation.forgotten, 'body'), authController.forgotten);
-router.post('/forgotten-confirm', validation(authValidation.forgottenConfirm, 'body'), authController.forgottenConfirm);
-
-router.post('/change-password', validation(authValidation.changePassword, 'body'), authenticateToken, authController.changePassword);
-router.post('/change-email', validation(authValidation.changeEmail, 'query'), authenticateToken, authController.changeEmail);
+router.post('/change-password', validateFields(authValidation.changePassword, 'body'), validateAccessToken, userController.changePassword);
+router.post('/change-email', validateFields(authValidation.changeEmail, 'query'), validateAccessToken, userController.changeEmail);
 
 export default router;

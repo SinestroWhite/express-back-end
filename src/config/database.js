@@ -1,7 +1,7 @@
 import mysql from 'mysql';
 import fs from 'fs';
 import path from 'path';
-import logger from './Logger.js';
+import logger from './logger.js';
 
 import dotenv from 'dotenv';
 dotenv.config();

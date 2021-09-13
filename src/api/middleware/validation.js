@@ -1,5 +1,5 @@
-import BadRequestError from '../../errors/BadRequestError.js';
-import validationErrorMessages from '../../common/ValidationErrorMessages.js';
+import BadRequestError from '../../errors/bad-request-error.js';
+import validationErrorMessages from '../../common/validation-error-messages.js';
 
 export default function (schema, property) {
     return function (req, res, next) {

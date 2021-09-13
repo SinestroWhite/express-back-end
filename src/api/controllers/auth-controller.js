@@ -1,10 +1,10 @@
 // Auth Controller
 // Description: Handles the authentication operations
 
-import STATUS_CODES from '../../common/enums/StatusCodes.js';
-import format from '../../utilities/Format.js';
-import BadRequestError from '../../errors/BadRequestError.js';
-import authService from '../services/AuthService.js';
+import STATUS_CODES from '../../common/enums/status-codes.js';
+import format from '../../utilities/format.js';
+import BadRequestError from '../../errors/bad-request-error.js';
+import authService from '../services/auth-service.js';
 
 function login(req, res, next) {
     const email = req.body.email.toLowerCase();

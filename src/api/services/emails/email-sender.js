@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 
-import InternalServerError from '../../../errors/InternalServerError.js';
-import logger from '../../../config/Logger.js';
+import InternalServerError from '../../../errors/internal-server-error.js';
+import logger from '../../../config/logger.js';
 
 const transport = nodemailer.createTransport({
     service: 'gmail',

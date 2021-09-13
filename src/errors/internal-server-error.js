@@ -1,4 +1,4 @@
-import ApplicationError from './ApplicationError.js';
+import ApplicationError from './application-error.js';
 
 class InternalServerError extends ApplicationError {
     constructor(message) {

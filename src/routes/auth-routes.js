@@ -1,9 +1,9 @@
 import {Router} from 'express';
-import authController from '../api/controllers/AuthController.js';
-import authenticateToken from '../api/middleware/Authentication.js';
+import authController from '../api/controllers/auth-controller.js';
+import authenticateToken from '../api/middleware/authentication.js';
 
-import authValidation from '../api/validation/AuthValidation.js';
-import validation from '../api/middleware/Validation.js';
+import authValidation from '../api/validation/auth-validation.js';
+import validation from '../api/middleware/validation.js';
 
 const router = Router();
 

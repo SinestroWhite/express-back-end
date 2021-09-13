@@ -1,8 +1,8 @@
 import express from 'express';
 import path from 'path';
-import STATUS_CODES from '../common/enums/StatusCodes.js';
-import authRoutes from './AuthRoutes.js';
-import errorHandler from '../api/middleware/ErrorHandler.js';
+import STATUS_CODES from '../common/enums/status-codes.js';
+import authRoutes from './auth-routes.js';
+import errorHandler from '../api/middleware/error-handler.js';
 
 export default function (app) {
     app.use('/api/v1/auth', authRoutes);

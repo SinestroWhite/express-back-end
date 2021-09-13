@@ -1,15 +1,15 @@
 import argon2 from 'argon2';
-import db from '../../config/Database.js';
+import db from '../../config/database.js';
 import jwt from 'jsonwebtoken';
 
-import logger from '../../config/Logger.js';
-import encryption from '../../utilities/Encryption.js';
-import emailSender from './emails/EmailSneder.js';
+import logger from '../../config/logger.js';
+import encryption from '../../utilities/encryption.js';
+import emailSender from './emails/email-sender.js';
 
-import BadRequestError from '../../errors/BadRequestError.js';
-import InternalServerError from '../../errors/InternalServerError.js';
+import BadRequestError from '../../errors/bad-request-error.js';
+import InternalServerError from '../../errors/internal-server-error.js';
 
-import GLOBAL_CONSTANTS from '../../common/GlobalConstants.js';
+import GLOBAL_CONSTANTS from '../../common/global-constants.js';
 const expireTime = GLOBAL_CONSTANTS.TOKEN_EXPIRE_TIME;
 
 export default {

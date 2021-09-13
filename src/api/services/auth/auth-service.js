@@ -116,11 +116,15 @@ async function getUserByEmail(email) {
 }
 
 function generateAccessToken(id, email) {
-    return jwt.sign({id, email}, process.env.TOKEN_SECRET, { expiresIn: EXPIRE });
+    return jwt.sign({id, email}, process.env.TOKEN_SECRET, {
+        expiresIn: EXPIRE
+    });
 }
 
 function generateRefreshToken(id, email) {
-    return jwt.sign({id, email}, process.env.TOKEN_SECRET, { expiresIn: REFRESH_EXPIRE.toString() });
+    return jwt.sign({id, email}, process.env.TOKEN_SECRET, {
+        expiresIn: REFRESH_EXPIRE.toString()
+    });
 }
 
 async function insertUser(email, password) {

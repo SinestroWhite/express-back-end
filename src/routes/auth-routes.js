@@ -11,7 +11,7 @@ import validateFields from '../api/middleware/validation.js';
 import authValidation from '../api/validation/auth-validation.js';
 
 const router = Router();
-// TODO: Add rate limiter
+
 router.post('/register', validateFields(authValidation.register, 'body'), authController.register);
 router.post('/login', validateFields(authValidation.login, 'body'), authController.login);
 router.post('/logout', validateFields(authValidation.confirm, 'body'), authController.logout);
@@ -24,6 +24,6 @@ router.post('/forgotten', validateFields(authValidation.forgotten, 'body'), forg
 router.post('/forgotten-confirm', validateFields(authValidation.forgottenConfirm, 'body'), forgottenController.forgottenConfirm);
 
 router.post('/change-password', validateFields(authValidation.changePassword, 'body'), validateAccessToken, userController.changePassword);
-router.post('/change-email', validateFields(authValidation.changeEmail, 'query'), validateAccessToken, userController.changeEmail);
+router.post('/change-email', validateFields(authValidation.changeEmail, 'body'), validateAccessToken, userController.changeEmail);
 
 export default router;

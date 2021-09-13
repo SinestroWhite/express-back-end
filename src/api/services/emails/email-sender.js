@@ -14,8 +14,17 @@ const transport = nodemailer.createTransport({
     }
 });
 
+async function sendEmail(message) {
+    try {
+        await transport.sendMail(message);
+    } catch(exception) {
+        logger.error('Nodemailer:', exception);
+        throw new InternalServerError();
+    }
+}
+
 export default {
-    sendEmailConfirmationLink: async (email, token) => {
+    async sendEmailConfirmationLink(email, token) {
         const message = {
             from: 'Gallery <office@gallery.net>',
             to: email,
@@ -23,12 +32,18 @@ export default {
             html: `http://localhost:${process.env.HTTP_PORT}/api/v1/auth/confirm?token=${token}`
         };
 
-        try {
-            await transport.sendMail(message);
-        } catch(exception) {
-            logger.error('Nodemailer:', exception);
-            throw new InternalServerError();
-        }
+        await sendEmail(message);
+        return true;
+    },
+    async sendEmailForgottenPassword(email, token) {
+        const message = {
+            from: 'Gallery <office@gallery.net>',
+            to: email,
+            subject: 'Gallery Forgotten Password',
+            html: `Confirmation token: ${token}`
+        };
+
+        await sendEmail(message);
         return true;
     }
 };

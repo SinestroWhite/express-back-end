@@ -21,6 +21,15 @@ const schemas = {
     changeEmail: Joi.object().keys({
         new_email: Joi.string().required().lowercase().trim().email(),
     }),
+    forgotten: Joi.object().keys({
+        email: Joi.string().required().lowercase().trim().email(),
+    }),
+    forgottenConfirm: Joi.object().keys({
+        token: Joi.string().required(),
+        password: Joi.string().required().min(6),
+        confirm_password: Joi.string().required().equal(Joi.ref('password'))
+    }),
 };
+
 
 export default schemas;

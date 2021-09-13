@@ -1,7 +1,7 @@
 import format from '../../utilities/format.js';
 import logger from '../../config/logger.js';
 
-export default function (err, req, res) {
+export default function (err, req, res, next) {
     if (process.env.NODE_ENV === 'development') {
         console.log('ErrorHandle', err);
     }

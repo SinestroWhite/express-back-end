@@ -37,7 +37,7 @@ function resend(req, res, next) {
 }
 
 function confirm(req, res, next) {
-    const id = req.query.token;
+    const id = req.body.token;
 
     authService.confirm(id).then(() => {
         res.status(STATUS_CODES.OK);
@@ -72,11 +72,32 @@ function changeEmail(req, res, next) {
     }).catch(next);
 }
 
+function forgotten(req, res, next) {
+    const email = req.body.email;
+
+    authService.forgotten(email).then(() => {
+        res.status(STATUS_CODES.OK);
+        res.json(format.success('We have send you an email. Please, check your inbox.'));
+    }).catch(next);
+}
+
+function forgottenConfirm(req, res, next) {
+    const id = req.body.token;
+    const password = req.body.password;
+
+    authService.forgottenConfirm(id, password).then(() => {
+        res.status(STATUS_CODES.OK);
+        res.json(format.success('Your password has been reset.'));
+    }).catch(next);
+}
+
 export default {
     login,
     register,
     resend,
     confirm,
     changeEmail,
-    changePassword
+    changePassword,
+    forgotten,
+    forgottenConfirm
 };

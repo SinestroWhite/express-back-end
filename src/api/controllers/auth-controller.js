@@ -91,6 +91,26 @@ function forgottenConfirm(req, res, next) {
     }).catch(next);
 }
 
+function refreshToken(req, res, next) {
+    // const authHeader = req.headers['authorization'];
+    // const token = authHeader && authHeader.split(' ')[1];
+    const refresh_token = req.body.token;
+
+    authService.refreshToken(refresh_token).then((data) => {
+        res.status(STATUS_CODES.OK);
+        res.json(data);
+    }).catch(next);
+}
+
+function logout(req, res, next) {
+    const refresh_token = req.body.token;
+
+    authService.revokeToken(refresh_token).then(() => {
+        res.status(STATUS_CODES.OK);
+        res.json(format.success('You have been successfully logout.'));
+    }).catch(next);
+}
+
 export default {
     login,
     register,
@@ -99,5 +119,7 @@ export default {
     changeEmail,
     changePassword,
     forgotten,
-    forgottenConfirm
+    forgottenConfirm,
+    refreshToken,
+    logout
 };

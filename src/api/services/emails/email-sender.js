@@ -26,9 +26,9 @@ async function sendEmail(message) {
 export default {
     async sendEmailConfirmationLink(email, token) {
         const message = {
-            from: 'Gallery <office@gallery.net>',
+            from: 'Office <office@office.net>',
             to: email,
-            subject: 'Gallery Email Confirmation',
+            subject: 'Office Email Confirmation',
             html: `http://localhost:${process.env.HTTP_PORT}/api/v1/auth/confirm?token=${token}`
         };
 
@@ -37,9 +37,9 @@ export default {
     },
     async sendEmailForgottenPassword(email, token) {
         const message = {
-            from: 'Gallery <office@gallery.net>',
+            from: 'Office <office@office.net>',
             to: email,
-            subject: 'Gallery Forgotten Password',
+            subject: 'Office Forgotten Password',
             html: `Confirmation token: ${token}`
         };
 

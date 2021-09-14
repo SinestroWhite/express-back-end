@@ -1,11 +1,9 @@
 import BadRequestError from '../../errors/bad-request-error.js';
-import validationErrorMessages from '../../common/validation-error-messages.js';
 
 export default function (schema, property) {
     return function (req, res, next) {
 
         const { error } = schema.validate(req[property], {
-            messages: validationErrorMessages,
             errors: {
                 wrap: {
                     label: ''

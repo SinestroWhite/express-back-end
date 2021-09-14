@@ -14,7 +14,6 @@ export default function (req, res, next) {
 
     req.id = id;
     req.email = email;
-    console.log(id, email);
 
     next();
 }

@@ -43,9 +43,18 @@ const forgotten = rateLimit({
     }
 });
 
+const message = rateLimit({
+    windowMs: 60 * 1000,
+    max: 10,
+    message: {
+        message: slowDownMessage
+    }
+});
+
 export default {
     register,
     login,
     resend,
-    forgotten
+    forgotten,
+    message
 };

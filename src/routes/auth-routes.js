@@ -9,7 +9,7 @@ import validateAccessToken from '../api/middleware/authentication.js';
 import validateFields from '../api/middleware/validation.js';
 
 import authValidation from '../api/validation/auth-validation.js';
-import limiter from '../api/services/auth/limiter-service.js';
+import limiter from '../api/services/limiter-service.js';
 
 const router = Router();
 

@@ -9,18 +9,19 @@ import validateAccessToken from '../api/middleware/authentication.js';
 import validateFields from '../api/middleware/validation.js';
 
 import authValidation from '../api/validation/auth-validation.js';
+import limiter from '../api/services/auth/limiter-service.js';
 
 const router = Router();
 
-router.post('/register', validateFields(authValidation.register, 'body'), authController.register);
-router.post('/login', validateFields(authValidation.login, 'body'), authController.login);
+router.post('/register', limiter.register, validateFields(authValidation.register, 'body'), authController.register);
+router.post('/login', validateFields(authValidation.login, 'body'), limiter.login, authController.login);
 router.post('/logout', validateFields(authValidation.confirm, 'body'), authController.logout);
 router.post('/refresh-token', validateFields(authValidation.confirm, 'body'), authController.refreshToken);
 
-router.get('/resend', validateAccessToken, confirmController.resend);
+router.get('/resend', validateAccessToken, limiter.resend, confirmController.resend);
 router.post('/confirm', validateFields(authValidation.confirm, 'body'), confirmController.confirm);
 
-router.post('/forgotten', validateFields(authValidation.forgotten, 'body'), forgottenController.forgotten);
+router.post('/forgotten', validateFields(authValidation.forgotten, 'body'), limiter.forgotten, forgottenController.forgotten);
 router.post('/forgotten-confirm', validateFields(authValidation.forgottenConfirm, 'body'), forgottenController.forgottenConfirm);
 
 router.post('/change-password', validateFields(authValidation.changePassword, 'body'), validateAccessToken, userController.changePassword);

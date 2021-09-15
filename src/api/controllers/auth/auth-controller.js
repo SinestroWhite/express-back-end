@@ -13,7 +13,7 @@ export default {
 };
 
 function login(req, res, next) {
-    const email = req.body.email.toLowerCase();
+    const email = req.body.email;
     const password = req.body.password;
 
     authService.authenticate(email, password).then((data) => {
